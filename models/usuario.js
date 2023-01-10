@@ -1,16 +1,15 @@
-const mongooseHidden = require('mongoose-hidden');
-const { Schema, model } = require('mongoose');
 
+const { Schema, model } = require('mongoose');
 
 const UsuarioSchema = Schema({
     nombre: {
         type: String,
-        required: [true, 'El nombre es obligatorio'],
+        required: [true, 'El nombre es obligatorio']
     },
     correo: {
         type: String,
         required: [true, 'El correo es obligatorio'],
-        unique: true,
+        unique: true
     },
     password: {
         type: String,
@@ -22,23 +21,24 @@ const UsuarioSchema = Schema({
     rol: {
         type: String,
         required: true,
-        enum: ['ADMIN_ROLE', 'USER_ROLE'],
+        emun: ['ADMIN_ROLE', 'USER_ROLE']
     },
     estado: {
         type: Boolean,
-        default: true,
+        default: true
     },
     google: {
         type: Boolean,
-        default: false,
-    }
+        default: false
+    },
 });
 
+
+
 UsuarioSchema.methods.toJSON = function() {
-    const { __v, password, _id, ...usuario } = this.toObject();  // extraer argumentos
+    const { __v, password, _id, ...usuario  } = this.toObject();
     usuario.uid = _id;
     return usuario;
 }
 
-UsuarioSchema.plugin(mongooseHidden, { hidden: { _id: false, password: true } });
-module.exports = model('Usuario', UsuarioSchema);
+module.exports = model( 'Usuario', UsuarioSchema );
