@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Google Sign-in</title>
 </head>
@@ -12,10 +11,9 @@
     <hr>
 
     <div id="g_id_onload"
-         data-client_id="822660521289-hr52ncbd1vt7hc6o16bqsda7dokj3eke.apps.googleusercontent.com"
+         data-client_id="611578068865-3gbippeuifmrn59c7fu2mh1tb0jt8g98.apps.googleusercontent.com"
          data-callback="handleCredentialResponse"
-         data-auto_prompt="false"
-         data-auto_select="true">
+         data-auto_prompt="false">
       </div>
       <div class="g_id_signin"
          data-type="standard"
@@ -27,44 +25,54 @@
       </div>
 
       <button id="google_signout">
-        Sign Out
+        Signout
       </button>
-      <hr>
+
     <script src="https://accounts.google.com/gsi/client" async defer></script>
 
     <script>
-        function handleCredentialResponse(response) {
-
-            // GOOGLE Token : ID_TOKEN
-           //console.log('id_token', response.credential);
-           const body = { id_token: response.credential};
-
-           fetch('http://localhost:8080/api/auth/google', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(body),
-           })
-                .then(resp => resp.json())
-                .then(resp => {
-                    console.log(resp)
-                    localStorage.setItem('email', resp.usuario.correo)
-                })
-                .catch(console.warn);
-
-        }
+       function handleCredentialResponse(response) {
+            
+            const id_token=response.credential;
+            const data = { id_token };
+            const url = (window.location.hostname.includes('localhost') )
+                    ? 'http://localhost:8080/api/auth/google'
+                    : 'https://abcde.herokuapp.com/api/auth/google'
+    
+            const myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+    
+            const myInit = { method: 'POST',
+                        headers: myHeaders,
+                        mode: 'cors',
+                        cache: 'default',
+                        body: JSON.stringify(data) };
+    
+            const myRequest = new Request(url, myInit);
         
+        
+            fetch( myRequest )
+            .then(resp => resp.json() )
+            .then(data => console.log('Nuestro Server', data))
+            //then(resp => {
+            //     console.log(resp);
+            //     localStorage.setItem('imail', resp.usuario.correo);
+            //     location.reload();
+
+            // })
+            .catch(console.warn);     
+            //console.log('id_token',response.credential);
+        }
+
         const button = document.getElementById('google_signout');
         button.onclick = () => {
+          console.log(google.accounts.id)
+          google.accounts.id.disableAutoSelect()
 
-            console.log(google.accounts.id)
-            google.accounts.id.disableAutoSelect()
-
-            google.accounts.id.revoke(localStorage.getItem('email'), done => {
-                localStorage.clear();
-                location.reload();
-            })
+          google.accounts.id.revoke(localStorage.getItem('imail'), done => {
+            localStorage.clear();
+            location.reload()
+          });
 
         }
 
